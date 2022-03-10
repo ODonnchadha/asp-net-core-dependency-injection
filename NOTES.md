@@ -1,12 +1,12 @@
 ## Dependency Injection in ASP.NET Core 6
 
-- Course Overview:
+- COURSE OVERVIEW:
   - Steve Gordon. Current version: .NET 6.0. C# 10. Visual Studio 2022.
   - Follow along with a "before" solution. Tennis Booking application.
     - U: member@example.com   P: password
     - U: admin@example.com    P: password
 
-- Registering and Injecting Services:
+- REGISTERING & INJECTING SERVICES:
   - Patterns & principles:
     - Inversion of control:
     - Dependency Inversion principle:
@@ -40,10 +40,16 @@
       - Generally services can be registered in any other.
       - An exception to this is when intentionally registering multiple implementations of the same abstraction.
   - Inject framework dependencies:
-    - 
   - Review the benefits:
+    - Promotes loose coupling of components.
+    - Promotes logical abstraction of components.
+    - Supports unit testing.
+    - Cleaner, more readable code.
+  - Improved testing:
+    - Can manually constract classes under test after applying inversion of control, providing fakes, mocks, or stubs.
 
-- The Microsoft Dependency Injection Container
+- MICROSOFT DEPENDENCY INJECTION CONTAINER:
+  - 
 - Registering More Complex Service
 - Injecting and Resolving Dependencies
 - Beyond the Built-in Container

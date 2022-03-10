@@ -1,13 +1,18 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TennisBookings.Shared.Interfaces.Services;
-using TennisBookings.Shared.Services.Weather;
 
 namespace TennisBookings.Pages
 {
-    public class IndexModel : PageModel
+	public class IndexModel : PageModel
     {
+		// This is registered as part of the ASP.NET Core Hosting Framework.
+		private readonly ILogger<IndexModel> logger;
 		private readonly IWeatherForecaster service;
-		public IndexModel(IWeatherForecaster service) => this.service = service;
+		public IndexModel(ILogger<IndexModel> logger, IWeatherForecaster service)
+		{
+			this.logger = logger;
+			this.service = service;
+		}
 		public string WeatherDescription { get; private set; } =
             "We don't have the latest weather information right now, " +
 			"please check again later.";
@@ -50,9 +55,9 @@ namespace TennisBookings.Pages
                         break;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-				// TODO
+				logger.LogError(ex?.Message);
 			}
         }
     }
