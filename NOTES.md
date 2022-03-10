@@ -49,7 +49,34 @@
     - Can manually constract classes under test after applying inversion of control, providing fakes, mocks, or stubs.
 
 - MICROSOFT DEPENDENCY INJECTION CONTAINER:
-  - 
+  - How ASP.NET Core uses the container.
+  - What to register with the DI container.
+  - Service lifetimes.
+  - The ASP.NET Core Request Lifecycle:
+    - Client (HTTP) -> Kestrel (Ports) -> HttpContext -> Root Container -> Scope created for the current request.
+    - HTTP Context is passed into ASP.NET Core which is processed via the configured application pipeline.
+    - Several middleware components and the final endpoint that produces the response. (e.g.: Razor page.)
+    - Services are required to activate components are then resolved from this scope.
+    - By resolving services via the scope rather than the root service provider instances are only shared across the current ASP.NET request.
+  - Built-in DI Container. Resolving needed services.
+    - HTTP Request -> Endpoint Activation -> Resolve Srvices (Dependency Injection Container.)
+    ```csharp
+      Microsoft.Extensions.DependencyInjection
+      Microsoft.AspNetCore.App
+    ```
+    - Dependency Injection Container = Inversion Of Control Container.
+    - A Dependency Injection Container is not a requirement to apply dependency injection. Using one simplifies management of dependencies.
+    - Services are registered with the container at startup, and resolved via the container at runtime. (When required.)
+    - Container creates and disposes. Components: 
+      - IServiceCollection: Registering and configuring services.
+      - IServiceProvider: Resolving a service at runtime.
+  - What to register? Identifying dependencies.
+    - Locate "new" keyword useage. Is the object a dependency?
+      - Are methods called on the type which are required for the consuming type to function?
+    - Apply dependency inversion.
+      - Accept the dependency via the constructor.
+    - Register the service with the container.
+
 - Registering More Complex Service
 - Injecting and Resolving Dependencies
 - Beyond the Built-in Container
