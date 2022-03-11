@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using TennisBookings.Configuration;
 using TennisBookings.Shared.Interfaces.Services;
 using TennisBookings.Shared.Models.Weather;
 
@@ -9,23 +11,16 @@ public class IndexTests
 	[Fact]
 	public async Task ReturnsExpectedViewModel_WhenWeatherIsMocked()
 	{
-		var sut = new IndexModel(NullLogger< IndexModel>.Instance, new MockForecaster());
+		var sut = new IndexModel(
+			new EnabledConfiguration(),
+			NullLogger<IndexModel>.Instance,
+			new MockForecaster());
 
 		await sut.OnGet();
 
 		Assert.Contains("We don't have the latest weather information right now, " +
 			"please check again later.", sut.WeatherDescription);
 	}
-
-	//[Fact]
-	//public async Task ReturnsExpectedViewModel_WhenWeatherIsRain()
-	//{
-	//	//var sut = new IndexModel();
-
-	//	//await sut.OnGet();
-
-	//	//Assert.Contains("We're sorry but it's raining here.", sut.WeatherDescription);
-	//}
 
 	private class MockForecaster : IWeatherForecaster
 	{
@@ -40,5 +35,11 @@ public class IndexTests
 				}
 			});
 		}
+	}
+
+	private class EnabledConfiguration: IOptionsSnapshot<FeaturesConfiguration>
+	{
+		public FeaturesConfiguration Value => new FeaturesConfiguration { EnableWeatherForecast = true };
+		public FeaturesConfiguration Get(string name) => throw new NotImplementedException();
 	}
 }

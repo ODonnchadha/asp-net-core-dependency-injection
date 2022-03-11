@@ -76,6 +76,18 @@
     - Apply dependency inversion.
       - Accept the dependency via the constructor.
     - Register the service with the container.
+      - Dependency graph: Layers of dependencies due to SRP.
+      - Register all services in the dependency graph.
+      - Use constructor injection to accept dependencies.
+      - The Microsoft container will manage creation of the object graph.
+      - Some useages of the 'new' keyword do not identfy a dependency.
+      - POCO. Plain Ol' CLR Objects. Registering POCO classes is a misuse of the dependency injection pattern.
+        - These are not depencies. They are used mainly as the inout or output from methods.
+        - They can be created using the 'new' keyword.
+      - Does the object creation affect testability of the class?
+      - Primitive types & string should not be injected or registered in a dependency injection container.
+      - Value types, structs, cannot be registered with the container.
+    - Best practice for handing configuration: Use the built-in ASP.NET Core configuration system & options pattern.
 
 - Registering More Complex Service
 - Injecting and Resolving Dependencies
