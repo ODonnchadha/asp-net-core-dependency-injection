@@ -88,6 +88,32 @@
       - Primitive types & string should not be injected or registered in a dependency injection container.
       - Value types, structs, cannot be registered with the container.
     - Best practice for handing configuration: Use the built-in ASP.NET Core configuration system & options pattern.
+    - Service Lifetime:
+      - Registering lifetimes on the IServiceCollection.
+      - The DI container tracks the instances it creates. Objects are disposed of or released for garbage collection once their lifetime ends.
+      - The lifetime affects the creation and reuse of service instances. Choose wisely!
+      - AddTransient<>(); A new instance every time the service is resolved.
+        - Every dependent class receives its own unique instance when the dependency is injected by the container.
+        - Methods on the instance are safe to mutate internal state. Without fear of access by other consumers and friends.
+        - Most useful when the service contains mutable state. And is not considered thread safe. Small performance cost.
+        - Memory must be allocated. Multiple objects are created. More work for the garbage collector.
+        - Easiest to reason about. Safest choice.
+      - AddSingleton<>();
+        - One shared instance for the lifetime of the container (application.) No disposal or garbage collection. 
+        - Can improve application performance, especially if the object is expensive to construct.
+        - Must be thread-safe. Avoid mutable state.
+        - Suited to: Functional stateless services. e.g.: Caches. 
+        - COnsider frequency of use vs. memory consumption. Possible to create memory leaks using the singleton lifetime.
+        - Beware of singleton services where memory usage grows significantly over time.
+        - If a service is used very infrequently, the singleton lifetime may not be appropriate.
+      - AddScoped<>();
+        - An instance per scope (request.) Similiar to singleton, but within the context of the scope.
+        - The container creates a new instance per request. Not required to be thread-safe.
+        - Components used in the request lifecycle receive the same dependency instance.
+        - Useful if a service may be required by multiple consumers per request. e.g.: EF's DbContext.
+        - DbContext change tracking works across a single request.
+        - Should not be captured by singleton services.
+      - Avoiding captive dependencies.
 
 - Registering More Complex Service
 - Injecting and Resolving Dependencies
