@@ -103,7 +103,7 @@
         - Can improve application performance, especially if the object is expensive to construct.
         - Must be thread-safe. Avoid mutable state.
         - Suited to: Functional stateless services. e.g.: Caches. 
-        - COnsider frequency of use vs. memory consumption. Possible to create memory leaks using the singleton lifetime.
+        - Consider frequency of use vs. memory consumption. Possible to create memory leaks using the singleton lifetime.
         - Beware of singleton services where memory usage grows significantly over time.
         - If a service is used very infrequently, the singleton lifetime may not be appropriate.
       - AddScoped<>();
@@ -113,7 +113,40 @@
         - Useful if a service may be required by multiple consumers per request. e.g.: EF's DbContext.
         - DbContext change tracking works across a single request.
         - Should not be captured by singleton services.
-      - Avoiding captive dependencies.
+      - Avoiding captive dependencies:
+        - Ensure that the service lifetime is approprite. Consider the lifetime of dependencies.
+        - Captive dependencies. May live longer than intended.
+        - NOTE: A service should not depend upon a service with a lifetime shorter than its own.
+        - e.g.: A scoped service with a transient service dependency means that a single instance of the transient service will life for the lifetime of the scopped service.
+        - Side-effects of captured dependencies.
+          - Accidental sharing of non-thread safe services between threads.
+          - Objects living longer that their expected lifetime.
+      - Scope Validation:
+        - Enabled by default in development. ASPNETCORE_ENVIRONMENT.
+        - Validates container scopes. e.g.: No scoped services are captured within singleton services.
+        - Validation occurs at startup when the buld method is invoked. Causing a runtime InvalidOperationException.
+        - Register both services with the same lifetime.
+        - Configure extra options:
+        ```csharp
+          builder.Host.UseDefaultServiceProvider(options => {
+            options.ValidateScopes = false;
+          });
+        ```
+      - Disposal of Services:
+        - IDisposable. Dispose pattern:
+          - Disposable types:
+          - A using block or using statement is leveraged to signal release of a disposable type.
+          - The compiler generates code which class Dispose() as soon as the consuming code no longer needs it.
+          - The DI container supports IDisposable types. Calls Dispose() on instances at the end of their lifetime.
+          - Automatic for types owned by the container. User-created instances are not disposed. Lifetime is managed externally.
+        - IAsyncDisposable. Supports asynchronous disposal of types. IServiceProvider supports disposal as asynchronous types.
+          - .NET 6:
+          - Added a new CreateAsyncScope extension method which returns a scope wrapped in AsyncSericeScope: IDisposable, IAsyncDisposable.
+          - This wrapper determines if IServiceScope implements IAsyncDisposable.
+        - Enjoy (& beware) the ValidateOnBuild(). Configurable on the ServicePoviderOptions.
+          - Enabled by default in development. Triggered by builder.Build();
+        - ASP.NET Core Component Activation: 
+          - Controllers & Razor pages are activated per request and are not directly registered with the DI container by default.
 
 - Registering More Complex Service
 - Injecting and Resolving Dependencies
