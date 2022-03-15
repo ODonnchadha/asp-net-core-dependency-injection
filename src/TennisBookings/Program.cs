@@ -20,31 +20,62 @@ using TennisBookings.BackgroundService;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using TennisBookings.Shared.Services.Weather;
 using TennisBookings.Shared.Interfaces.Services;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using TennisBookings.Services.Membership;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
 
+services.Configure<ClubConfiguration>(builder.Configuration.GetSection("ClubSettings"));
 services.Configure<FeaturesConfiguration>(builder.Configuration.GetSection("Features"));
+
 services.Configure<BookingConfiguration>(builder.Configuration.GetSection("CourtBookings"));
+services.TryAddSingleton<IBookingConfiguration>(s =>
+	s.GetRequiredService<IOptions<BookingConfiguration>>().Value);
+
+services.Configure<MembershipConfiguration>(builder.Configuration.GetSection("Membership"));
+services.AddTransient<IMembershipAdvertBuilder, MembershipAdvertBuilder>();
+services.AddSingleton<IMembershipAdvert>(s =>
+{
+	var builder = s.GetRequiredService<IMembershipAdvertBuilder>();
+	// Using the builder instance to create the membership advert.
+	builder.WithDiscount(10m);
+	var advert = builder.Build();
+	// As the service implementation.
+	return advert;
+});
+
+
+// Use Add() and not TryAdd() because we want all implementations:
+services.AddSingleton<ICourtBookingRule, ClubIsOpenRule>();
+services.AddSingleton<ICourtBookingRule, MaxBookingLengthRule>();
+services.AddSingleton<ICourtBookingRule, MaxPeakTimeBookingLengthRule>();
+services.AddScoped<ICourtBookingRule, MemberBookingsMustNotOverlapRule>();
+services.AddScoped<ICourtBookingRule, MemberCourtBookingsMaxHoursPerDayRule>();
+
+services.TryAddEnumerable(new ServiceDescriptor[]
+{
+	ServiceDescriptor.Scoped<IUnavailabilityProvider, ClubClosedUnavailabilityProvider>(),
+	ServiceDescriptor.Scoped<IUnavailabilityProvider, UpcomingHoursUnavailabilityProvider>(),
+	ServiceDescriptor.Scoped<IUnavailabilityProvider, OutsideCourtUnavailabilityProvider>(),
+	ServiceDescriptor.Scoped<IUnavailabilityProvider, CourtBookingUnavailabilityProvider>()
+});
 
 services.AddSingleton<IWeatherForecaster, RandomWeatherForecaster>();
-
 // e.g.: Creates a new instance of a ServiceDescriptor using its constructor.
 var serviceDescriptor1 = new ServiceDescriptor(typeof(IWeatherForecaster),
 	typeof(RandomWeatherForecaster), ServiceLifetime.Singleton);
 // services.Add(serviceDescriptor1);
-
 // e.g.: Uses a static factory method on the ServiceDescriptor.
 var serviceDescriptor2 = ServiceDescriptor.Describe(typeof(IWeatherForecaster),
 	typeof(RandomWeatherForecaster), ServiceLifetime.Singleton);
 // services.Add(serviceDescriptor2);
-
 // e.g.: Singleton static static factory.
 var serviceDescriptor3 = ServiceDescriptor.Singleton(typeof(IWeatherForecaster),
 	typeof(RandomWeatherForecaster));
 // services.Add(serviceDescriptor3);
-
 // e.g.: Generic singleton static static factory.
 var serviceDescriptor4 = ServiceDescriptor.Singleton<IWeatherForecaster,
 	RandomWeatherForecaster>();

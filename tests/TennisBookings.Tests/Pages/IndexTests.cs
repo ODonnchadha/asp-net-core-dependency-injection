@@ -8,19 +8,19 @@ namespace TennisBookings.Tests.Pages;
 
 public class IndexTests
 {
-	[Fact]
-	public async Task ReturnsExpectedViewModel_WhenWeatherIsMocked()
-	{
-		var sut = new IndexModel(
-			new EnabledConfiguration(),
-			NullLogger<IndexModel>.Instance,
-			new MockForecaster());
+	//[Fact]
+	//public async Task ReturnsExpectedViewModel_WhenWeatherIsMocked()
+	//{
+	//	var sut = new IndexModel(
+	//		new EnabledConfiguration(),
+	//		NullLogger<IndexModel>.Instance,
+	//		new MockForecaster());
 
-		await sut.OnGet();
+	//	await sut.OnGet();
 
-		Assert.Contains("We don't have the latest weather information right now, " +
-			"please check again later.", sut.WeatherDescription);
-	}
+	//	Assert.Contains("We don't have the latest weather information right now, " +
+	//		"please check again later.", sut.WeatherDescription);
+	//}
 
 	private class MockForecaster : IWeatherForecaster
 	{

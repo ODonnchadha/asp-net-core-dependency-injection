@@ -173,6 +173,52 @@
     - TryAdd() methods are far more convenient in complex applications that contain many service registrations. Extent is more clear.
   - Registering an interface multiple times:
     - Multiple entires or registrations in a service collection. Last in is the preferred choice.
+    - Replacing:
+    - Looks for the first existing registration matching the service type.
+    - If an entry is located it is removed. A new registration for the service type is then added.
+    - Its specified implementation type will be used for the new registration.
+    - Replacing only supports removing the first registration of a service type from IServiceCollection.
+    - Rare, except for perhaps Framework or third-party registrations.
+    ```csharp
+      services.Replace(ServiceDescriptor.Singleton<IWeatherForecaster, RandomWeatherForecaster>());
+      services.RemoveAll(IWeatherForecaster);
+    ```
+  - Why the container allows multiple service registrations.
+  - Implement a rule pattern by registering multiple implementations of an interface.
+    - Add new functionality with minimal changes to existing code. e.g.: BookingRuleProcessor.
+  - IEnumerable<T> Dependencies:
+    - The service provider resolves all registered implementations for the service type.
+    - This only applies when the parameter is typed as IEnumerable.
+  - Simple Extensibility:
+    - Adding new rules: Add new ICourtBookingRule implementation. Rehgister it with IServiceCollection.
+    - A nice example of SRP and seperation of concerns. Application is easier to maintain.
+    - What happens if the same implentation is added twice?
+      - The Add() methods are not idempotent. Recommended to avoid duplication and express intent more clearly.
+      ```csharp
+        services.TryAddEnumerable(ServiceDescriptor.Scoped<IUnavailabilityProvider, ClubClosedUnavailabilityProvider>());
+        services.TryAddEnumerable(new ServiceDescriptor[]
+        {
+          ServiceDescriptor.Scoped<IUnavailabilityProvider, ClubClosedUnavailabilityProvider>(),
+          ServiceDescriptor.Scoped<IUnavailabilityProvider, UpcomingHoursUnavailabilityProvider>()
+        });
+      ```
+    - Registering services via implementation factory. Provide the complete control of the implentation type.
+      - Signature:
+        ```csharp
+          public static void TryAddSingleton<TService>(this IServiceCollection services,
+            Func<IServiceProvider, TService> implentationFactory) where TService: class;
+        ```
+      - Invoked at runtime. Has access to the built IServiceProvider. May resolve services. 
+      - Responsible for returning a constructed instance of the service type.
+      - Forwarding registerations.
+    - Poor candidate for dependency injection. e.g.:
+    ```csharp
+    	public MembershipAdvert(decimal offerPrice, decimal discount)
+      {
+        OfferPrice = offerPrice;
+        Saving = discount;
+      }
+      ```
 
 - Injecting and Resolving Dependencies
 - Beyond the Built-in Container

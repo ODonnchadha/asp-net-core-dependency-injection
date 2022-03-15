@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
+using TennisBookings.Services.Membership;
 using TennisBookings.Shared.Interfaces.Services;
 
 namespace TennisBookings.Pages
@@ -9,14 +10,18 @@ namespace TennisBookings.Pages
 		private readonly FeaturesConfiguration configuration;
 		private readonly ILogger<IndexModel> logger;
 		private readonly IWeatherForecaster service;
+		public IMembershipAdvert Advert { get; private set; }
 		public IndexModel(
 			IOptionsSnapshot<FeaturesConfiguration> configuration,
 			ILogger<IndexModel> logger,
-			IWeatherForecaster service)
+			IWeatherForecaster service,
+			IMembershipAdvert advert)
 		{
 			this.configuration = configuration.Value;
 			this.logger = logger;
 			this.service = service;
+
+			Advert = advert;
 		}
 		public string WeatherDescription { get; private set; } =
             "We don't have the latest weather information right now, " +

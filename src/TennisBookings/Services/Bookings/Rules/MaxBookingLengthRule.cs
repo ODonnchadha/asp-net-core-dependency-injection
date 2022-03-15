@@ -4,18 +4,25 @@ namespace TennisBookings.Services.Bookings.Rules
 {
 	public class MaxBookingLengthRule : ICourtBookingRule
 	{
-		private readonly BookingConfiguration _bookingConfiguration;
+		//private readonly BookingConfiguration _bookingConfiguration;
 
-		public MaxBookingLengthRule(IOptions<BookingConfiguration> options)
+		//public MaxBookingLengthRule(IOptions<BookingConfiguration> options)
+		//{
+		//	_bookingConfiguration = options.Value;
+		//}
+
+		private readonly IBookingConfiguration _configuration;
+		public MaxBookingLengthRule(IBookingConfiguration configuration)
 		{
-			_bookingConfiguration = options.Value;
+			_configuration = configuration;
 		}
 
 		public Task<bool> CompliesWithRuleAsync(CourtBooking booking)
 		{
 			var bookingLength = booking.EndDateTime - booking.StartDateTime;
 
-			var compliesWithRule = bookingLength <= TimeSpan.FromHours(_bookingConfiguration.MaxRegularBookingLengthInHours);
+			// var compliesWithRule = bookingLength <= TimeSpan.FromHours(_bookingConfiguration.MaxRegularBookingLengthInHours);
+			var compliesWithRule = bookingLength <= TimeSpan.FromHours(_configuration.MaxRegularBookingLengthInHours);
 
 			return Task.FromResult(compliesWithRule);
 		}
