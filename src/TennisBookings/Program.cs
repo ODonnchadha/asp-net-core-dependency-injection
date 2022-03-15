@@ -28,7 +28,28 @@ var services = builder.Services;
 services.Configure<FeaturesConfiguration>(builder.Configuration.GetSection("Features"));
 services.Configure<BookingConfiguration>(builder.Configuration.GetSection("CourtBookings"));
 
-services.AddTransient<IWeatherForecaster, RandomWeatherForecaster>();
+services.AddSingleton<IWeatherForecaster, RandomWeatherForecaster>();
+
+// e.g.: Creates a new instance of a ServiceDescriptor using its constructor.
+var serviceDescriptor1 = new ServiceDescriptor(typeof(IWeatherForecaster),
+	typeof(RandomWeatherForecaster), ServiceLifetime.Singleton);
+// services.Add(serviceDescriptor1);
+
+// e.g.: Uses a static factory method on the ServiceDescriptor.
+var serviceDescriptor2 = ServiceDescriptor.Describe(typeof(IWeatherForecaster),
+	typeof(RandomWeatherForecaster), ServiceLifetime.Singleton);
+// services.Add(serviceDescriptor2);
+
+// e.g.: Singleton static static factory.
+var serviceDescriptor3 = ServiceDescriptor.Singleton(typeof(IWeatherForecaster),
+	typeof(RandomWeatherForecaster));
+// services.Add(serviceDescriptor3);
+
+// e.g.: Generic singleton static static factory.
+var serviceDescriptor4 = ServiceDescriptor.Singleton<IWeatherForecaster,
+	RandomWeatherForecaster>();
+// services.Add(serviceDescriptor4);
+
 services.AddScoped<ICourtBookingService, CourtBookingService>();
 services.AddSingleton<IUtcTimeService, TimeService>();
 services.AddScoped<IBookingService, BookingService>();

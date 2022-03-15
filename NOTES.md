@@ -148,6 +148,31 @@
         - ASP.NET Core Component Activation: 
           - Controllers & Razor pages are activated per request and are not directly registered with the DI container by default.
 
-- Registering More Complex Service
+- REGISTERING MORE COMPLEX SERVICES:
+  - Upcoming:
+    - IServiceCollection extension methods. Advanced service requirements.
+    - Review the options when using the built-in Microsoft container, and explore where we reach limitations.
+    - Improving registration code organization.
+  - Service Descriptors:
+    - Contain information about registered services. We rarely nee to work directly with service descriptors.
+    ```csharp
+      public class ServiceDescriptor
+      {
+        public Type ImplementationType { get; }
+        public Type ServiceType { get; }
+        public ServiceLifetime Lifetime { get; }
+        public object ImplementationInstance { get; }
+        public Func<IServiceProvider, object> ImplementationFactory { get; }
+      }
+    ```
+    - Created with (Try)AddTrasient(), etc... Used internally be the service provider to resolve services.
+  - Duplicated service registrations.
+    - Hit breakpoint. Run locals window for name/value. NOTE: Last registration wins RE: runtime resolve.
+  - Add() versus TryAdd() behaviour.
+    - Using the TryAdd() extension method: NOTE: Only registers a service if the service type does not already exist in the IServiceCollection.
+    - TryAdd() methods are far more convenient in complex applications that contain many service registrations. Extent is more clear.
+  - Registering an interface multiple times:
+    - Multiple entires or registrations in a service collection. Last in is the preferred choice.
+
 - Injecting and Resolving Dependencies
 - Beyond the Built-in Container
