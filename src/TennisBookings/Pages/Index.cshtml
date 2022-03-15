@@ -6,16 +6,16 @@
 
 <h1>@ViewData["Title"]</h1>
 
-@*@if (Model.Advert is not null)
+@if (Model.Advert is not null)
 {
     <div class="row">
         <div class="col-md-12">
             <div class="alert alert-success" role="alert">
-                @($"Save ${Model.Advert.Saving} on membership today!")
+                @($"Save ${Model?.Advert?.Saving} on membership today!")
             </div>
         </div>
     </div>
-}*@
+}
 
 @if (User?.Identity is not null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
 {

@@ -219,6 +219,8 @@
         Saving = discount;
       }
       ```
+      - Why register an implementtion against multiple services?
+      
 
 - Injecting and Resolving Dependencies
 - Beyond the Built-in Container
