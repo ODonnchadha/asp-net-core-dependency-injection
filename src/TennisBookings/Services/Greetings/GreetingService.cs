@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace TennisBookings.Services.Greetings
 {
-	public class GreetingService : IHomePageGreetingService
+	public class GreetingService : IHomePageGreetingService, ILoggedInUserGreetingService
 	{
 		private static readonly ThreadLocal<Random> Random = new(() => new Random());
 
@@ -40,10 +40,16 @@ namespace TennisBookings.Services.Greetings
 			return greetingToUse >= 0 ? greetings[greetingToUse] : string.Empty;
 		}
 
+		public UserGreeting GetLoggedInGreeting(string name)
+		{
+			var loggedInGreeting = GetRandomValue(LoginGreetings);
+
+			return loggedInGreeting.Replace("{name}", name);
+		}
+
 		private class GreetingData
 		{
 			public string[] Greetings { get; set; } = Array.Empty<string>();
-
 			public string[] LoginGreetings { get; set; } = Array.Empty<string>();
 		}
 	}

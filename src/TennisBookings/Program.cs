@@ -24,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using TennisBookings.Services.Membership;
 using TennisBookings.Services.Greetings;
+using TennisBookings.Caching;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,8 +49,22 @@ services.AddSingleton<IMembershipAdvert>(s =>
 	return advert;
 });
 
-services.TryAddSingleton<IHomePageGreetingService, GreetingService>();
+//3.)
+services.TryAddSingleton<GreetingService>();
+services.TryAddSingleton<IHomePageGreetingService>(s => s.GetRequiredService<GreetingService>());
+services.TryAddSingleton<ILoggedInUserGreetingService>(s => s.GetRequiredService<GreetingService>());
+//2.) Overload with pre-instantiated (single) instance.
+//var greetingService = new GreetingService(builder.Environment);
+//services.TryAddSingleton<IHomePageGreetingService>(greetingService);
+//services.TryAddSingleton<ILoggedInUserGreetingService>(greetingService);
+//1.)
+//services.TryAddSingleton<IHomePageGreetingService, GreetingService>();
+//services.TryAddSingleton<ILoggedInUserGreetingService, GreetingService>();
 
+// Explicit registration. It works with only a single type cached.
+// services.TryAddSingleton<IDistributedCache<UserGreeting>, DistributedCache<UserGreeting>>();
+// Passing an open generic. Argument provided at runtime.
+services.TryAddSingleton(typeof(IDistributedCache<>), typeof(DistributedCache<>));
 
 // Use Add() and not TryAdd() because we want all implementations:
 services.AddSingleton<ICourtBookingRule, ClubIsOpenRule>();

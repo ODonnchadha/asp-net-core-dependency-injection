@@ -10,19 +10,19 @@ namespace TennisBookings.Pages
     {
 		private readonly FeaturesConfiguration configuration;
 		private readonly ILogger<IndexModel> logger;
-		private readonly IWeatherForecaster service;
+		private readonly IWeatherForecaster weather;
 		private readonly IHomePageGreetingService greeting;
 		public IMembershipAdvert Advert { get; private set; }
 		public IndexModel(
 			IOptionsSnapshot<FeaturesConfiguration> configuration,
 			ILogger<IndexModel> logger,
-			IWeatherForecaster service,
+			IWeatherForecaster weather,
 			IMembershipAdvert advert,
 			IHomePageGreetingService greeting)
 		{
 			this.configuration = configuration.Value;
 			this.logger = logger;
-			this.service = service;
+			this.weather = weather;
 			this.greeting = greeting;
 			Advert = advert;
 		}
@@ -42,7 +42,7 @@ namespace TennisBookings.Pages
 			{
 				try
 				{
-					var currentWeather = await service.GetCurrentWeatherAsync("Eastbourne");
+					var currentWeather = await weather.GetCurrentWeatherAsync("Eastbourne");
 
 					switch (currentWeather.Weather.Summary)
 					{
