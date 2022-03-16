@@ -26,6 +26,7 @@ using TennisBookings.Services.Membership;
 using TennisBookings.Services.Greetings;
 using TennisBookings.Caching;
 using TennisBookings.DependencyInjection;
+using TennisBookings.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -104,6 +105,9 @@ services.AddSingleton<INotificationService, EmailNotificationService>();
 
 services.AddScoped<ICourtMaintenanceService, CourtMaintenanceService>();
 
+// Factory-based middleware. More control over the lifetime of middleware components when desired.
+services.TryAddScoped<LastRequestMiddlewareFactory>();
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(options =>
 {
@@ -155,6 +159,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<LastRequestMiddleware>();
 
 app.MapControllerRoute(
 	name: "default",

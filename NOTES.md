@@ -270,6 +270,23 @@
           [FromServices] ICourtMaintenanceService courtMaintenanceService)
       ```
     - DI with Minimal APIs.
-
+    - Injecting services into middleware.
+      - Middleware activation differs from framework components such as controllers.
+      - NOTE: Each middleware component is constructed once when the application starts.
+        - Constructor dependencies are therefore resolved from the root container. So singletons within the application.
+        - Dependencies are captured for the application's lifetime.
+        - Avoid injecting scoped or transient services via consructor injection.
+      - The Invoke/InvokeAsync method is onvoked once per request. Parameters are resolved from the request scope.
+    - Middleware DI:
+      - Constructor:
+        - Called once when the application starts. Supports only singleton services.
+        - Scoped or transient services will be captured and may not behave correctly.
+      - Invoke/InvokeAsync:
+        - Runs once per request. Services are activated and resolved from the request scope.
+        - Supports all service lifetimes.
+    - Injecting services into factory-based middleware. Factory-based components implement IMiddleware interface.
+      - Resolved by an IMiddlewareFactory on a per-request basis. 
+      - Transient & scoped services may be injected via their constructors. Rarely used.
+    - Injecting dependencies into Razor views.
 
 - Beyond the Built-in Container
