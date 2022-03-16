@@ -25,6 +25,7 @@ using Microsoft.Extensions.Options;
 using TennisBookings.Services.Membership;
 using TennisBookings.Services.Greetings;
 using TennisBookings.Caching;
+using TennisBookings.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,13 +67,6 @@ services.TryAddSingleton<ILoggedInUserGreetingService>(s => s.GetRequiredService
 // Passing an open generic. Argument provided at runtime.
 services.TryAddSingleton(typeof(IDistributedCache<>), typeof(DistributedCache<>));
 
-// Use Add() and not TryAdd() because we want all implementations:
-services.AddSingleton<ICourtBookingRule, ClubIsOpenRule>();
-services.AddSingleton<ICourtBookingRule, MaxBookingLengthRule>();
-services.AddSingleton<ICourtBookingRule, MaxPeakTimeBookingLengthRule>();
-services.AddScoped<ICourtBookingRule, MemberBookingsMustNotOverlapRule>();
-services.AddScoped<ICourtBookingRule, MemberCourtBookingsMaxHoursPerDayRule>();
-
 services.TryAddEnumerable(new ServiceDescriptor[]
 {
 	ServiceDescriptor.Scoped<IUnavailabilityProvider, ClubClosedUnavailabilityProvider>(),
@@ -81,6 +75,7 @@ services.TryAddEnumerable(new ServiceDescriptor[]
 	ServiceDescriptor.Scoped<IUnavailabilityProvider, CourtBookingUnavailabilityProvider>()
 });
 
+services.AddBookingRules();
 services.AddSingleton<IWeatherForecaster, RandomWeatherForecaster>();
 
 //// e.g.: Creates a new instance of a ServiceDescriptor using its constructor.
@@ -105,8 +100,9 @@ services.AddSingleton<IUtcTimeService, TimeService>();
 services.AddScoped<IBookingService, BookingService>();
 services.AddScoped<ICourtService, CourtService>();
 services.AddScoped<ICourtBookingManager, CourtBookingManager>();
-services.AddScoped<IBookingRuleProcessor, BookingRuleProcessor>();
 services.AddSingleton<INotificationService, EmailNotificationService>();
+
+services.AddScoped<ICourtMaintenanceService, CourtMaintenanceService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(options =>

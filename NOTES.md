@@ -220,7 +220,56 @@
       }
       ```
       - Why register an implementtion against multiple services?
-      
+      - e.g.: NOTE: Two singleton instances due to unique registration.
+      ```csharp
+        services.TryAddSingleton<IHomePageGreetingService, GreetingService>();
+        services.TryAddSingleton<ILoggedInUserGreetingService, GreetingService>();
+      ```
+      - Any instances created outside of the dependency injection container ar NOT automatically disposed of or released for garbage collection:
+      ```csharp
+        var greetingService = new GreetingService(builder.Environment);
+        // Overload with pre-instantiated (single) instance.
+        services.TryAddSingleton<IHomePageGreetingService>(greetingService);
+        services.TryAddSingleton<ILoggedInUserGreetingService>(greetingService);
+      ```
+    - Registering open generic service. e.g.:
+    ```csharp
+      public interface ILogger<out TCategoryName> : ILogger
+    ```
+    - Create extension methods to improve readibility.
+      - Grouping common functionality. Particularly beneficial in libraries to ensure correct registration of all required services.
 
-- Injecting and Resolving Dependencies
+- INJECTING & RESOLVING DEPENDENCIES:
+  - Upcoming:
+    - Locations. Constructor injection. Action injection. Middleware injection. Razor view injection. 
+    - Minimal API handler injection. Background/hosted service injection. (Manual scope creation.)
+  - Service Resolution Mechanisms:
+    - IServiceProvider. Services & their dependencies must be registered with the DI container.
+    - When creating an instance of a service from the container, its dependencies will also be resolved from the container.
+  - (Static) ActivatorUtilities:
+    - Can create objects that are not registered directly into the DI container.
+    - Create an object via its constructor. Arguments can be supplied directly or resolved from an IServiceProvider.
+    - Used to activate framework components. e.g.: Controllers, tag helpers, model binders.
+    - SHould not be called by application code.
+  - Constructor Injection:
+    - Controllers, Razor Page Models, ViewComponents, TagHelpers, Filters, Middleware, application classes.
+    - Constructor rules:
+      - Assign default values for arguments not provided by the container.
+      - When services are resolved, a public constructor is required.
+      - Only a single application constructor can exist for services resolved via ActivatorUtilities (framework components such as controllers.)
+    - NOTE: Services resolved from the container directly can support multiple application constructors.
+    - Injecting dependencies into controllers:
+      - ASP.NET Core activates (creates) a new controller instance per request. So, action injection.
+    - Injecting into action methods:
+      - Choosing: Depends on how widely used a dependency is used within a controller. COnstructor injection is most common.
+      - Action injection may be more efficient if a dependency is only needed by a single action.
+      - Such cases may indicate that a controller has too many responsibilities. Split actions across more focused controllers.
+      ```csharp
+        [Route("Maintenance/Upcoming")]
+        public async Task<ActionResult> UpcomingMaintenance(
+          [FromServices] ICourtMaintenanceService courtMaintenanceService)
+      ```
+    - DI with Minimal APIs.
+
+
 - Beyond the Built-in Container
