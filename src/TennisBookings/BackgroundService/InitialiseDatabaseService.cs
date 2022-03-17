@@ -12,8 +12,7 @@ public class InitialiseDatabaseService : IHostedService
 
 	public async Task StartAsync(CancellationToken cancellationToken)
 	{
-		// Blocks until this is completed
-
+		// Blocks until this is completed.
 		await using var serviceScope = _scopeFactory.CreateAsyncScope();
 
 		var dbContext = serviceScope.ServiceProvider.GetRequiredService<TennisBookingsDbContext>();
@@ -28,7 +27,7 @@ public class InitialiseDatabaseService : IHostedService
 			await roleManager.CreateAsync(adminRole);
 		}
 
-		var adminUser = new TennisBookingsUser()
+		var adminUser = new TennisBookingsUser
 		{
 			UserName = AdminEmail,
 			Email = AdminEmail,
@@ -50,7 +49,7 @@ public class InitialiseDatabaseService : IHostedService
 			}
 		}
 
-		var memberUser = new TennisBookingsUser()
+		var memberUser = new TennisBookingsUser
 		{
 			UserName = MemberEmail,
 			Email = MemberEmail,

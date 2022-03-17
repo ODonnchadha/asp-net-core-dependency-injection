@@ -288,5 +288,24 @@
       - Resolved by an IMiddlewareFactory on a per-request basis. 
       - Transient & scoped services may be injected via their constructors. Rarely used.
     - Injecting dependencies into Razor views.
+      - Take care to avoid the overuse of view injection. Avoid mixing concerns by inclusing business logic in Razor views.
+      - Accessing injected static configuration data inside views can be convenient.
+      - Ensure injected services are specific to the concern of view rendering:
+        - Localizing content. Populating lists.
+      - Pass state via page models, injecting dependencies into models rather than views.
+    - Injecting dependencies into Hosted Services:
+      - Manually creating scopes.
+      - At startup, the StartAsync method is called on all registered IHostedService implementations.
+      - Implementations of IHostedService are created when the application starts.
+      - Instances live until the application exits.
+      - Services injected into their constructors are captured for the life of the application.
+        - Only singleton services are safe to be injected in this manner.
+      - However, the constructor accepts an IServiceScopeFactory. Registered independently via the framework.
+        - This blocks. Avoid anything long-running.
+      = Service locator pattern: Resolving services directly from the provider. This is considered a bad practice. Prefer injection.
+      - Manual scope creation:
+        - Only required outside of the ASP.NET Core request cycle. Hosted services are the main example where this is necessary.
+        - Scopes must be disposed once they are no longer required to release scoped resources.
 
-- Beyond the Built-in Container
+- BEYOND THE BUILT-IN CONTAINER:
+  - [Scrutor](https://github.com/khellang/Scrutor): (1) Support for assembly scanning and (2) applying the decorator pattern.
