@@ -308,4 +308,12 @@
         - Scopes must be disposed once they are no longer required to release scoped resources.
 
 - BEYOND THE BUILT-IN CONTAINER:
-  - [Scrutor](https://github.com/khellang/Scrutor): (1) Support for assembly scanning and (2) applying the decorator pattern.
+  - [Scrutor](https://github.com/khellang/Scrutor):
+    - Support for assembly scanning: Add new implementation(s) dynamically. Reduces risk and manual intervention.
+    - Aplying the decorator pattern:
+      - Decprator pattern: Wrap functionality of services with additional functionality from an implementation sharing the same interface.
+      - Add features and extend functionality without modifying the exising classes.
+      - NOTE: Decorators are registered using the same lifetime as existing service descriptors.
+    - Decorators are a powerful manner in which to extend applications without modifying existing code.
+  - Third-party conforming containers:
+    - 

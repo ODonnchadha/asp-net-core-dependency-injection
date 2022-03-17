@@ -27,6 +27,7 @@ using TennisBookings.Services.Greetings;
 using TennisBookings.Caching;
 using TennisBookings.DependencyInjection;
 using TennisBookings.Middleware;
+using TennisBookings.Services.Weather;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,7 +78,9 @@ services.TryAddEnumerable(new ServiceDescriptor[]
 });
 
 services.AddBookingRules();
+
 services.AddSingleton<IWeatherForecaster, RandomWeatherForecaster>();
+services.Decorate<IWeatherForecaster, CachedWeatherForecaster>();
 
 //// e.g.: Creates a new instance of a ServiceDescriptor using its constructor.
 //var serviceDescriptor1 = new ServiceDescriptor(typeof(IWeatherForecaster),
