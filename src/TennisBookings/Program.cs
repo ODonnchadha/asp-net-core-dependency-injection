@@ -28,10 +28,41 @@ using TennisBookings.Caching;
 using TennisBookings.DependencyInjection;
 using TennisBookings.Middleware;
 using TennisBookings.Services.Weather;
+//using Autofac.Extensions.DependencyInjection;
+//using Autofac;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Now using Autofac.
+// builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+// Remove the decorator and use Autofac.
+// builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
+// {
+// 	builder.RegisterType<RandomWeatherForecaster>().As<IWeatherForecaster>().SingleInstance();
+// 	builder.RegisterDecorator<CachedWeatherForecaster, IWeatherForecaster>();
+// });
+
 var services = builder.Services;
+services.AddSingleton<IWeatherForecaster, RandomWeatherForecaster>();
+services.Decorate<IWeatherForecaster, CachedWeatherForecaster>();
+
+//// e.g.: Creates a new instance of a ServiceDescriptor using its constructor.
+//var serviceDescriptor1 = new ServiceDescriptor(typeof(IWeatherForecaster),
+//	typeof(RandomWeatherForecaster), ServiceLifetime.Singleton);
+//// services.Add(serviceDescriptor1);
+//// e.g.: Uses a static factory method on the ServiceDescriptor.
+//var serviceDescriptor2 = ServiceDescriptor.Describe(typeof(IWeatherForecaster),
+//	typeof(RandomWeatherForecaster), ServiceLifetime.Singleton);
+//// services.Add(serviceDescriptor2);
+//// e.g.: Singleton static static factory.
+//var serviceDescriptor3 = ServiceDescriptor.Singleton(typeof(IWeatherForecaster),
+//	typeof(RandomWeatherForecaster));
+//// services.Add(serviceDescriptor3);
+//// e.g.: Generic singleton static static factory.
+//var serviceDescriptor4 = ServiceDescriptor.Singleton<IWeatherForecaster,
+//	RandomWeatherForecaster>();
+//// services.Add(serviceDescriptor4);
 
 services.Configure<ClubConfiguration>(builder.Configuration.GetSection("ClubSettings"));
 services.Configure<FeaturesConfiguration>(builder.Configuration.GetSection("Features"));
@@ -78,26 +109,6 @@ services.TryAddEnumerable(new ServiceDescriptor[]
 });
 
 services.AddBookingRules();
-
-services.AddSingleton<IWeatherForecaster, RandomWeatherForecaster>();
-services.Decorate<IWeatherForecaster, CachedWeatherForecaster>();
-
-//// e.g.: Creates a new instance of a ServiceDescriptor using its constructor.
-//var serviceDescriptor1 = new ServiceDescriptor(typeof(IWeatherForecaster),
-//	typeof(RandomWeatherForecaster), ServiceLifetime.Singleton);
-//// services.Add(serviceDescriptor1);
-//// e.g.: Uses a static factory method on the ServiceDescriptor.
-//var serviceDescriptor2 = ServiceDescriptor.Describe(typeof(IWeatherForecaster),
-//	typeof(RandomWeatherForecaster), ServiceLifetime.Singleton);
-//// services.Add(serviceDescriptor2);
-//// e.g.: Singleton static static factory.
-//var serviceDescriptor3 = ServiceDescriptor.Singleton(typeof(IWeatherForecaster),
-//	typeof(RandomWeatherForecaster));
-//// services.Add(serviceDescriptor3);
-//// e.g.: Generic singleton static static factory.
-//var serviceDescriptor4 = ServiceDescriptor.Singleton<IWeatherForecaster,
-//	RandomWeatherForecaster>();
-//// services.Add(serviceDescriptor4);
 
 services.AddScoped<ICourtBookingService, CourtBookingService>();
 services.AddSingleton<IUtcTimeService, TimeService>();

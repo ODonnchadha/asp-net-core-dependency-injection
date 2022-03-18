@@ -316,4 +316,8 @@
       - NOTE: Decorators are registered using the same lifetime as existing service descriptors.
     - Decorators are a powerful manner in which to extend applications without modifying existing code.
   - Third-party conforming containers:
-    - 
+    - Many .NET dependency injection containers existed before the Microsoft DI container.
+    - Microsoft provide common abstractions. IServiceProvider & IServiceCollection define the concept of conforming containers.
+    - Third party? Can be useful for migrating legacy to ASP.NET Core.
+    - Install and use Autofac.
+    - The Microsoft container is feature-limited by design.
